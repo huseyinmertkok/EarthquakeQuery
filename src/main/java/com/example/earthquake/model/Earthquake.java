@@ -1,19 +1,16 @@
 package com.example.earthquake.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
-import java.util.Date;
-
 @Data
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Earthquake {
-    private String country;
     private String place;
-    private String magnitude;
-    //private Date date;
+    private Double mag;
 
-    public Earthquake(String country, String place, String magnitude){
-        this.country = country;
+    public Earthquake(String place, Double mag){
         this.place = place;
-        this.magnitude = magnitude;
+        this.mag = mag;
     }
 }
