@@ -1,6 +1,8 @@
 package com.example.earthquake.controller;
 
 import com.example.earthquake.model.Earthquake;
+import com.example.earthquake.utility.LatLng;
+import com.example.earthquake.utility.Util;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,12 +37,23 @@ public class EarthquakeController {
     private List<Earthquake> loadDataToList(int pastDaysCount, String country) throws IOException, InterruptedException, JSONException {
         String endDate = LocalDate.now().toString();
         String startDate = LocalDate.now().minusDays(pastDaysCount).toString();
+        LatLng latLng = Util.COUNTRIES_LAT_LON.get(country);
+        double minLat = latLng.getLatitude() - 30.0;
+        double maxLat = latLng.getLatitude() + 30.0;
+        double minLon = latLng.getLongitude() - 80.0;
+        double maxLon = latLng.getLongitude() + 80.0;
+
+        if(minLat < -90 || maxLat > 90){
+            minLat = latLng.getLatitude() - 14.0;
+            maxLat = latLng.getLatitude() + 14.0;
+        }
+
         List <Earthquake> tempList = new ArrayList<>();
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .GET()
                 .header("Content-Type", "application/json")
-                .uri(URI.create(API_URL + "starttime="+startDate+"&endtime="+endDate+"&minlatitude=36&maxlatitude=42&minlongitude=26&maxlongitude=45"))
+                .uri(URI.create(API_URL + "starttime="+startDate+"&endtime="+endDate+"&minlatitude="+minLat+"&maxlatitude="+maxLat+"&minlongitude="+minLon+"&maxlongitude="+maxLon))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         JSONObject jsonObject = new JSONObject(response.body());
@@ -53,7 +66,7 @@ public class EarthquakeController {
                     tempList.add(new Earthquake(
                             id,
                             country,
-                            jsonArray.getJSONObject(i).getJSONObject("properties").getString("place"),
+                            Util.capitalizeFirstLetter(jsonArray.getJSONObject(i).getJSONObject("properties").getString("place")),
                             jsonArray.getJSONObject(i).getJSONObject("properties").getDouble("mag"),
                             simpleDateFormat.format(new Date(jsonArray.getJSONObject(i).getJSONObject("properties").getLong("time")))
                     ));
