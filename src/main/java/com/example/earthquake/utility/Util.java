@@ -249,6 +249,9 @@ public class Util {
     }};
 
     public static final String[] statesInUsa = {
+            "Alabama",
+            "Alaska",
+            "Arizona",
             "Arkansas",
             "California",
             "Colorado",

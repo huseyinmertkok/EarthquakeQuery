@@ -37,6 +37,7 @@ public class EarthquakeController {
         //Check if is there any earthquake
         if(earthquakeList.isEmpty()){
             model.addAttribute("x", pastDaysCount);
+            model.addAttribute("country", country);
             return "empty";
         }
 
