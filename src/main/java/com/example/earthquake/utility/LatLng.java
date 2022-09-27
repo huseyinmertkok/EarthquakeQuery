@@ -7,7 +7,7 @@ public class LatLng {
     private double latitude;
     private double longitude;
 
-    private double maxRadiusKm;
+    private int maxRadiusKm;
 
 
     public LatLng(double latitude, double longitude, int maxRadiusKm) {
