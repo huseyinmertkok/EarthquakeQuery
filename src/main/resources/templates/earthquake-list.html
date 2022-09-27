@@ -10,14 +10,20 @@
     <table class="table table-striped">
         <thead>
         <tr>
+            <th scope="col">#</th>
+            <th scope="col">Country</th>
             <th scope="col">Place</th>
             <th scope="col">Magnitude</th>
+            <th scope="col">Date & Time</th>
         </tr>
         </thead>
         <tbody class="table-group-divider">
         <tr th:each="earth: ${earthquakes}">
+            <td th:text="${earth.id}"></td>
+            <td th:text="${earth.country}"></td>
             <td th:text="${earth.place}"></td>
             <td th:text="${earth.mag}"></td>
+            <td th:text="${earth.time}"></td>
         </tr>
         </tbody>
     </table>
