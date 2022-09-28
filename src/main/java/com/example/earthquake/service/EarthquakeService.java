@@ -27,6 +27,10 @@ public class EarthquakeService {
                 model.addAttribute("text", "Country is invalid!");
                 return "error";
             }
+            if(pastDaysCount <= 0){
+                model.addAttribute("text", "Past days count must be greater than 0!");
+                return "error";
+            }
             model.addAttribute("x", pastDaysCount);
             model.addAttribute("country", country);
             return "empty";
