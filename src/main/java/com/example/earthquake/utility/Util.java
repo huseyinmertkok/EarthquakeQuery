@@ -401,4 +401,8 @@ public class Util {
         return check;
     }
 
+    public static List<String> getAllCountries(){
+        return new ArrayList<String>(COUNTRIES_LAT_LON.keySet());
+    }
+
 }

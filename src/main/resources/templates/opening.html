@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Earthquake List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <h2>Choose Earthquake Place and Time</h2>
+        <hr/>
+        <form th:action="@{/earthquake/list}">
+            <table>
+                <tr>
+                    <td>Country Name</td>
+                    <td>
+                        <select th:value="${country}" name="country">
+                            <option th:each="names : ${countryName}" th:value="${names}" th:text="${names}"></option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Past Days</td>
+                    <td>
+                        <input type="number" th:value="${pastDaysCount}" name="pastDaysCount" min="1"/>
+                    </td>
+                </tr>
+            </table>
+            <button type="submit">Enter</button>
+        </form>
+    </div>
+</body>
+</html>

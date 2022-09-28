@@ -40,4 +40,11 @@ public class EarthquakeService {
         return "earthquake-list";
     }
 
+    public String openingScreen(Model model){
+        model.addAttribute("countryName", Util.getAllCountries());
+        model.addAttribute("country");
+        model.addAttribute("pastDaysCount", 30);
+        return "opening";
+    }
+
 }
