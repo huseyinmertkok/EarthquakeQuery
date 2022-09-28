@@ -1,8 +1,26 @@
 package com.example.earthquake.utility;
 
+import com.example.earthquake.model.Earthquake;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 public class Util {
+    public static boolean control = true;
+
+    private static final String API_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&";
+
     public static final HashMap<String, LatLng> COUNTRIES_LAT_LON = new HashMap<String, LatLng>() {{
         put("Andorra", new LatLng(42.546245, 1.601554,  150));
         put("United Arab Emirates", new LatLng(23.424076, 53.847818,  800));
@@ -190,7 +208,7 @@ public class Util {
         put("Réunion", new LatLng(-21.115141, 55.536384,  1200));
         put("Romania", new LatLng(45.943161, 24.96676,  1200));
         put("Serbia", new LatLng(44.016521, 21.005859,  1200));
-        put("Russia", new LatLng(61.52401, 105.318756,  2150));//, 2150,  1200));
+        put("Russia", new LatLng(61.52401, 105.318756,  2150));
         put("Rwanda", new LatLng(-1.940278, 29.873888,  1200));
         put("Saudi Arabia", new LatLng(23.885942, 45.079162,  1200));
         put("Solomon Islands", new LatLng(-9.64571, 160.156194,  1200));
@@ -300,6 +318,73 @@ public class Util {
             "Wisconsin",
             "Wyoming"
     };
+
+    public static List<Earthquake> loadDataToList(int pastDaysCount, String country) {
+        control = true;
+
+        //This day.
+        String endDate = LocalDate.now().toString();
+
+        //This day - past days
+        String startDate = LocalDate.now().minusDays(pastDaysCount).toString();
+
+        //Get Latitude and Longitude values from country name
+        LatLng latLng = Util.COUNTRIES_LAT_LON.get(country);
+
+        List <Earthquake> tempList = new ArrayList<>();
+        try{
+            //Creating our request
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .GET()
+                    .header("Content-Type", "application/json")
+                    .uri(URI.create(API_URL + "starttime="+startDate+"&endtime="+endDate+"&latitude="+latLng.getLatitude()+"&longitude="+latLng.getLongitude()+"&maxradiuskm="+latLng.getMaxRadiusKm()))
+                    .build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            //Creating a JSON object with json response.
+            JSONObject jsonObject = new JSONObject(response.body());
+            JSONArray jsonArray = jsonObject.getJSONArray("features");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+            int id = 1;
+            if(jsonArray.length() > 0){
+                for(int i=0; i<jsonArray.length(); i++){
+                    //United States is the only country name not part of the place value.
+                    if(!country.equals("United States")){
+                        if(jsonArray.getJSONObject(i).getJSONObject("properties").getString("place").toLowerCase().contains(country.toLowerCase())){
+                            tempList.add(new Earthquake(
+                                    id,
+                                    country,
+                                    Util.capitalizeFirstLetter(jsonArray.getJSONObject(i).getJSONObject("properties").getString("place")),
+                                    jsonArray.getJSONObject(i).getJSONObject("properties").getDouble("mag"),
+                                    simpleDateFormat.format(new Date(jsonArray.getJSONObject(i).getJSONObject("properties").getLong("time")))
+                            ));
+                            id++;
+                        }
+                    }else{
+                        //But there is State names in these value so 'place' will be checked for all the states.
+                        if(Util.stateControl(jsonArray.getJSONObject(i).getJSONObject("properties").getString("place").toLowerCase())){
+                            tempList.add(new Earthquake(
+                                    id,
+                                    country,
+                                    Util.capitalizeFirstLetter(jsonArray.getJSONObject(i).getJSONObject("properties").getString("place")),
+                                    jsonArray.getJSONObject(i).getJSONObject("properties").getDouble("mag"),
+                                    simpleDateFormat.format(new Date(jsonArray.getJSONObject(i).getJSONObject("properties").getLong("time")))
+                            ));
+                            id++;
+                        }
+                    }
+                }
+            }
+        }catch (JSONException j){
+            control = false;
+            j.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return tempList;
+    }
 
     public static String capitalizeFirstLetter(String str){
         return str.substring(0, 1).toUpperCase() + str.substring(1);

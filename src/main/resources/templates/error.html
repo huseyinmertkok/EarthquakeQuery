@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="https://www.thymeleaf.org">
 <body>
 <h1>Error 400: Bad Request</h1>
-<h2>Matching events exceeds search limit of 20000. Modify the search to match fewer events.</h2>
+<h2 th:text="${text}"></h2>
 <h1></h1>
-<a href="/earthquake">Go Back</a>
+<a href="/earthquake/list?country=Turkey&pastDaysCount=30">Example</a>
 </body>
 </html>
